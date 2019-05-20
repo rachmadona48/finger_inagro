@@ -179,7 +179,7 @@ class Model_absensi extends CI_Model {
 					from master_karyawan mk
 					WHERE mk.nik is not NULL
 				)dt
-				WHERE dt.jam_masuk is not NULL and dt.id_mesin in (89) ";
+				WHERE dt.jam_masuk is not NULL and dt.id_mesin in (591,598)  ";
 		// echo $sql;exit();
 		return $this->db->query($sql)->result();
 	}
