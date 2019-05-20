@@ -116,27 +116,68 @@ class Absensi extends CI_Controller {
 	}
 
 	public function kirim_data(){
+		
+
 		date_default_timezone_set('Asia/Jakarta');
         $date  = date('Y-m-d');
         $first_date = strtotime($date);
-        $backdate= strtotime('-3 day', $first_date);
+        $backdate= strtotime('-4 day', $first_date);
         $date_1 = date('Y-m-d', $backdate);
-
+        echo $date.' | '.$date_1.'<br/>';
         $get_data = $this->model_absensi->get_log_masuk($date_1);
 
-        foreach ($get_data as $key) {
-        	$data_kirim = json_encode($key);
+        // foreach ($get_data as $key) {
+        	// $data_kirim = json_encode($key);
 
         	// echo $data_kirim;
         	// $kirim = $this->kirim_data_masuk($data_kirim);
-        	$kirim = $this->kirim_data_masuk_2($key->USERID,$key->CHECKTIME);
-        }
+
+        	// $kirim = $this->kirim_data_masuk_2($key->USERID,$key->CHECKTIME);
+        // }
         
-        // $data_kirim = json_encode($get_data);
-        // $kirim = $this->kirim_data_masuk($data_kirim);
+        $data_kirim = json_encode($get_data);
+        $kirim = $this->kirim_data_masuk_3($data_kirim);
 
         $return = array('respon' => 'sukses');
         echo json_encode($return);
+	}
+
+	public function kirim_data_masuk_3($data_kirim){
+		$url = 'http://api.liramedika.com:8855/hris/v1/attendance/insertFingerprint';
+		$appid = 'DZEA7E79O3';
+		$secret = 'FrOymp6bYz4huFqd2UygaE0HbLdCNbpYXzD1X5JF9dC09691dm';
+		$idcompany= '9';
+
+		echo $data_kirim;
+
+		//hit lira api
+        $guzzleclient = new \GuzzleHttp\Client();
+        $params = [
+            'headers' => [
+                'Content-Type' => 'application/x-www-form-urlencode',
+                'appid' => $appid,
+                'secret' => $secret,
+                'idcompany' => $idcompany,
+            ],
+            'body' => $data_kirim
+        ];
+        
+        // echo '<pre>';
+        // print_r($params);
+        // echo '</pre>';
+
+        try {
+            $response = $guzzleclient->request('POST', $url, $params);
+            $body = $response->getBody();
+
+            $databody = json_decode($body);
+            print_r($databody);
+        }
+        catch(\GuzzleHttp\Exception\BadResponseException $e) {
+            echo 'push absen hris lira GAGAL.';
+        }
+
+        exit();
 	}
 
 	public function kirim_data_masuk($data_kirim){
@@ -196,8 +237,8 @@ class Absensi extends CI_Controller {
 		// echo '<br>tes api<br>';
 		// echo 'tes 9 <br>';
 
-		// $data_kirim = "{\"USERID\":\"758\",\"CHECKTIME\":\"2019-05-17 07:53:47\",\"CHECKTYPE\":\"I\",\"IDCOMPANY\":\"9\"}";
-		// echo $data_kirim;
+		$data_kirim = "{\"USERID\":\"758\",\"CHECKTIME\":\"2019-05-17 07:53:47\",\"CHECKTYPE\":\"I\",\"IDCOMPANY\":\"9\"}";
+		echo $data_kirim;
 
 		$data_kirim2 = "{\"USERID\":\"".$USERID."\",\"CHECKTIME\":\"".$CHECKTIME."\",\"CHECKTYPE\":\"I\",\"IDCOMPANY\":\"9\"}";
 		// echo $data_kirim2;
@@ -210,7 +251,7 @@ class Absensi extends CI_Controller {
 		  CURLOPT_RETURNTRANSFER => true,
 		  CURLOPT_ENCODING => "",
 		  CURLOPT_MAXREDIRS => 10,
-		  CURLOPT_TIMEOUT => 100,
+		  CURLOPT_TIMEOUT => 1000,
 		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 		  CURLOPT_CUSTOMREQUEST => "POST",
 		  CURLOPT_POSTFIELDS => $data_kirim2,
