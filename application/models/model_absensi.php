@@ -184,12 +184,29 @@ class Model_absensi extends CI_Model {
 		return $this->db->query($sql)->result();
 	}
 
-	public function get_masuk($id_mesin,$date_1){
-		$sql="SELECT id,id_mesin,tgl_jam
-				from log_absensi WHERE id_mesin = ".$id_mesin." and tgl_jam like '".$date_1."%' 
-				ORDER BY id asc LIMIT 1";
-		return $this->db->query($sql)->row();
+	public function get_log_pulang($date_1){
+		$sql="SELECT dt.id_mesin as USERID,
+					dt.jam_pulang as CHECKTIME,
+					'O' as CHECKTYPE,
+					'9' as IDCOMPANY
+				from
+				(
+					SELECT mk.id,mk.id_mesin,mk.nama,mk.nik,
+					(
+						SELECT tgl_jam
+						FROM log_absensi 
+						WHERE id_mesin = mk.id_mesin and tgl_jam LIKE '".$date_1."%'
+						ORDER BY tgl_jam DESC LIMIT 1
+					)as jam_pulang
+					from master_karyawan mk
+					WHERE mk.nik is not NULL
+				)dt
+				WHERE dt.jam_pulang is not NULL  ";
+		// echo $sql;exit();
+		return $this->db->query($sql)->result();
 	}
+
+	
 
 
 }
