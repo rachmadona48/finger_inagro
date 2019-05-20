@@ -1,3 +1,5 @@
+install composer pada server
+
 tarik absen dari mesin
 http://localhost/Inagro_finger/absensi/get_log_absen
 
