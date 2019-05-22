@@ -49,7 +49,7 @@ class Absensi extends CI_Controller {
 		date_default_timezone_set('Asia/Jakarta');
         $date  = date('Y-m-d');
         $first_date = strtotime($date);
-        $backdate= strtotime('-7 day', $first_date);
+        $backdate= strtotime('-1 day', $first_date);
         $date_1 = date('Y-m-d', $backdate);
 
         echo $date.' | '.$date_1;
@@ -122,9 +122,9 @@ class Absensi extends CI_Controller {
 		date_default_timezone_set('Asia/Jakarta');
         $date  = date('Y-m-d');
         $first_date = strtotime($date);
-        $backdate= strtotime('-7 day', $first_date);
+        $backdate= strtotime('-1 day', $first_date);
         $date_1 = date('Y-m-d', $backdate);
-        // echo $date.' | '.$date_1.'<br/>';
+        echo $date.' | '.$date_1.'<br/>';
 
         // Jam masuk
         $get_data_masuk = $this->model_absensi->get_log_masuk($date_1);
@@ -146,7 +146,7 @@ class Absensi extends CI_Controller {
 		$secret = 'FrOymp6bYz4huFqd2UygaE0HbLdCNbpYXzD1X5JF9dC09691dm';
 		$idcompany= '9';
 
-		// echo $data_kirim;
+		// echo $data_kirim;exit();
 
 		//hit lira api
         $api_guzzle = new \GuzzleHttp\Client();
@@ -178,10 +178,12 @@ class Absensi extends CI_Controller {
         }
 
         // print_r($output);
+        $msg = $pesan.' : '.$date_1.'('.$CHECKTYPE.')';
+        $log = $this->model_absensi->log_push_api($msg);
 
-        $fp = fopen('file_api.txt', 'w');
-		fwrite($fp, $pesan.' : '.$date_1.'('.$CHECKTYPE.')'. "\n");
-		fclose($fp);
+  //       $fp = fopen('file_api.txt', 'w');
+		// fwrite($fp, $pesan.' : '.$date_1.'('.$CHECKTYPE.')'. "\n");
+		// fclose($fp);
 
         return True;
 	}
