@@ -206,12 +206,12 @@ class Model_absensi extends CI_Model {
 		return $this->db->query($sql)->result();
 	}
 
-	public function log_push_api($msg){
+	public function log_push_api($msg,$id_mesin,$CHECKTYPE){
 		date_default_timezone_set('Asia/Jakarta');
         $date  = date('Y-m-d H-i-s');
 
-        $sql = "INSERT INTO log_api(msg,date_push)
-					VALUE('".$msg."','".$date."')";
+        $sql = "INSERT INTO log_api(msg,date_push,type,id_mesin)
+					VALUE('".$msg."','".$date."','".$CHECKTYPE."',".$id_mesin.")";
 		$this->db->query($sql);
 
 		return True;

@@ -1,10 +1,10 @@
 install composer pada server
 
 tarik absen dari mesin
-http://localhost/Inagro_finger/absensi/get_log_absen
+http://localhost:8080/Inagro_finger/absensi/get_log_absen
 
 kirim data ke corporate
-http://localhost/Inagro_finger/absensi/kirim_data
+http://localhost:8080/Inagro_finger/absensi/kirim_data
 
 
 data yg sudah dikirim 13 dan 14 mei 2019

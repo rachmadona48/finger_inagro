@@ -16,6 +16,7 @@ class Absensi extends CI_Controller {
 	
 	public function index()
 	{
+		// echo base_url();exit();
 		$this->load->view('template/header');
 		$this->load->view('template/menu');
 		$this->load->view('data_karyawan');
@@ -54,9 +55,9 @@ class Absensi extends CI_Controller {
 
         echo $date.' | '.$date_1;
 
-		$IP="192.168.10.91";
+		$IP="10.161.100.3";
 		$Key="0";
-		if($IP=="") $IP="192.168.10.91";
+		if($IP=="") $IP="10.161.100.3";
 		if($Key=="") $Key="0";
 
 		    $Connect = fsockopen($IP, "80", $errno, $errstr, 1);
@@ -128,19 +129,32 @@ class Absensi extends CI_Controller {
 
         // Jam masuk
         $get_data_masuk = $this->model_absensi->get_log_masuk($date_1);
-        $data_masuk = json_encode($get_data_masuk);
-        $masuk = $this->send_to_corporate($data_masuk,'I',$date_1);
+        // $data_masuk = json_encode($get_data_masuk);
+        // $masuk = $this->send_to_corporate($data_masuk,'I',$date_1);
+        foreach ($get_data_masuk as $masuk) {
+        	$data_masuk = json_encode($masuk);
+        	// echo $data_masuk.' - '.$masuk->USERID;
+        	$masuk = $this->send_to_corporate($data_masuk,'I',$date_1,$masuk->USERID);
+        }
+
+        // exit();
+        
 
         // Jam pulang
         $get_data_pulang = $this->model_absensi->get_log_pulang($date_1);
-        $data_pulang = json_encode($get_data_pulang);
-        $pulang = $this->send_to_corporate($data_pulang,'O',$date_1);
+        // $data_pulang = json_encode($get_data_pulang);
+        // $pulang = $this->send_to_corporate($data_pulang,'O',$date_1);
+        foreach ($get_data_pulang as $pulang) {
+        	$data_pulang = json_encode($pulang);
+        	// echo $data_masuk.' - '.$masuk->USERID;
+        	$pulang = $this->send_to_corporate($data_pulang,'O',$date_1,$pulang->USERID);
+        }
 
         $return = array('respon' => 'sukses');
         echo json_encode($return);
 	}
 
-	public function send_to_corporate($data_kirim,$CHECKTYPE,$date_1){
+	public function send_to_corporate($data_kirim,$CHECKTYPE,$date_1,$id_mesin){
 		$url = 'http://api.liramedika.com:8855/hris/v1/attendance/insertFingerprint';
 		$appid = 'DZEA7E79O3';
 		$secret = 'FrOymp6bYz4huFqd2UygaE0HbLdCNbpYXzD1X5JF9dC09691dm';
@@ -179,7 +193,7 @@ class Absensi extends CI_Controller {
 
         // print_r($output);
         $msg = $pesan.' : '.$date_1.'('.$CHECKTYPE.')';
-        $log = $this->model_absensi->log_push_api($msg);
+        $log = $this->model_absensi->log_push_api($msg,$id_mesin,$CHECKTYPE);
 
   //       $fp = fopen('file_api.txt', 'w');
 		// fwrite($fp, $pesan.' : '.$date_1.'('.$CHECKTYPE.')'. "\n");

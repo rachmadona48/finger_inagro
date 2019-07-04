@@ -1,0 +1,1 @@
+D:\inagro\xampp\php\php.exe D:\inagro\xampp\htdocs\Inagro_finger\index.php absensi/get_log_absen
