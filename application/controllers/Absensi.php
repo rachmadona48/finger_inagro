@@ -51,9 +51,10 @@ class Absensi extends CI_Controller {
         $date  = date('Y-m-d');
         $first_date = strtotime($date);
         $backdate= strtotime('-1 day', $first_date);
+        // $backdate= strtotime('-1 day', $first_date);
         $date_1 = date('Y-m-d', $backdate);
 
-        echo $date.' | '.$date_1;
+        
 
 		$IP="10.161.100.3";
 		$Key="0";
@@ -62,7 +63,7 @@ class Absensi extends CI_Controller {
 
 		    $Connect = fsockopen($IP, "80", $errno, $errstr, 1);
 		    if($Connect){
-		        
+		        // echo 'dd';
 		        $soap_request="<GetAttLog>
 		                            <ArgComKey xsi:type=\"xsd:integer\">".$Key."</ArgComKey>
 		                            <Arg><PIN xsi:type=\"xsd:integer\">All</PIN></Arg>
@@ -78,6 +79,7 @@ class Absensi extends CI_Controller {
 		        $buffer="";
 		        while($Response=fgets($Connect, 1024)){
 		            $buffer=$buffer.$Response;
+		            // echo $buffer;
 		        }
 
 		    }else echo "Koneksi Gagal";
@@ -91,7 +93,7 @@ class Absensi extends CI_Controller {
 		        $pin=$this->Parse_Data($data,"<PIN>","</PIN>");
 		        $datetime=$this->Parse_Data($data,"<DateTime>","</DateTime>");
 		        $status=$this->Parse_Data($data,"<Status>","</Status>");
-
+		        // echo $data.' | '.$pin.' | '.$datetime.' | '.$status.' | '.substr($datetime,0,10);
 		        if(substr($datetime,0,10)==$date_1){
 		            // echo $data.' | '.$pin.' | '.$datetime.' | '.$status.' | '.substr($datetime,0,10);
 		            $this->model_absensi->insert_log_absen($pin,$datetime); 
@@ -100,6 +102,7 @@ class Absensi extends CI_Controller {
 		        // echo '<br/>';
 		      
 		    }
+		echo $date.' | '.$date_1;
 		$return = array('respon' => 'sukses');
         echo json_encode($return);
 	}
@@ -124,16 +127,14 @@ class Absensi extends CI_Controller {
         $date  = date('Y-m-d');
         $first_date = strtotime($date);
         $backdate= strtotime('-1 day', $first_date);
+        // $backdate= strtotime('-1 day', $first_date);
         $date_1 = date('Y-m-d', $backdate);
         echo $date.' | '.$date_1.'<br/>';
 
         // Jam masuk
         $get_data_masuk = $this->model_absensi->get_log_masuk($date_1);
-        // $data_masuk = json_encode($get_data_masuk);
-        // $masuk = $this->send_to_corporate($data_masuk,'I',$date_1);
         foreach ($get_data_masuk as $masuk) {
         	$data_masuk = json_encode($masuk);
-        	// echo $data_masuk.' - '.$masuk->USERID;
         	$masuk = $this->send_to_corporate($data_masuk,'I',$date_1,$masuk->USERID);
         }
 
@@ -142,11 +143,8 @@ class Absensi extends CI_Controller {
 
         // Jam pulang
         $get_data_pulang = $this->model_absensi->get_log_pulang($date_1);
-        // $data_pulang = json_encode($get_data_pulang);
-        // $pulang = $this->send_to_corporate($data_pulang,'O',$date_1);
         foreach ($get_data_pulang as $pulang) {
         	$data_pulang = json_encode($pulang);
-        	// echo $data_masuk.' - '.$masuk->USERID;
         	$pulang = $this->send_to_corporate($data_pulang,'O',$date_1,$pulang->USERID);
         }
 
